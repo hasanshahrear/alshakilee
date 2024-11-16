@@ -15,7 +15,6 @@ export class CustomerController {
   @Post()
   @UsePipes(new ValidationPipe())
   async createCustomer(@Body() customer: CreateCustomerDto) {
-    this._customerService.createCustomer(customer);
-    return;
+    return this._customerService.createCustomer(customer);
   }
 }
