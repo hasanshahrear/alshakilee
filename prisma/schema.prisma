@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id       Int       @id @default(autoincrement())
+  mobile   String    @unique
+  name     String
+  invoices Invoice[]
+}
+
+model Invoice {
+  id            Int           @id @default(autoincrement())
+  invoiceNumber String        @unique
+  customerId    Int
+  invoiceDate   DateTime
+  deliveryDate  DateTime
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items         InvoiceItem[]
+
+  @@index([customerId])
+}
+
+model Design {
+  id    Int           @id @default(autoincrement())
+  name  String        @unique
+  items InvoiceItem[]
+}
+
+model BottomType {
+  id    Int           @id @default(autoincrement())
+  name  String        @unique
+  items InvoiceItem[]
+}
+
+model InvoiceItem {
+  id           Int         @id @default(autoincrement())
+  invoiceId    Int
+  designTypeId Int
+  bottomTypeId Int
+  quantity     Int         @default(1)
+  length       Float
+  shoulder     Float
+  hand         Float
+  handLouse    Float
+  neck         Float
+  neckLouse    Float
+  centreLouse  Float
+  pocketStyle  PocketStyle
+  sewingType   SewingType
+  sdType       SDType
+
+  invoice    Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  designType Design     @relation(fields: [designTypeId], references: [id], onDelete: Restrict)
+  bottomType BottomType @relation(fields: [bottomTypeId], references: [id], onDelete: Restrict)
+
+  @@index([invoiceId, designTypeId, bottomTypeId])
+}
+
+enum PocketStyle {
+  P2
+  P2_Bag
+}
+
+enum SewingType {
+  Chap
+  Lock
+}
+
+enum SDType {
+  SD
+  No_SD
+}
