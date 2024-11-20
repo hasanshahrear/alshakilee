@@ -34,6 +34,7 @@ export class CustomerController {
   }
 
   @Patch(':id')
+  @UsePipes(new ValidationPipe())
   update(
     @Param('id') id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,

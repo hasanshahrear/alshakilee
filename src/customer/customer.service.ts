@@ -20,7 +20,7 @@ export class CustomerService {
       const result = await this._prisma.customer.create({
         data: createCustomerDto,
       });
-      return this.httpResponseService.generate(HttpStatus.OK, result);
+      return this.httpResponseService.generate(HttpStatus.CREATED, result);
     } catch (error) {
       processHttpError(error, this.logger);
       throw new HttpResponseException(
@@ -33,12 +33,38 @@ export class CustomerService {
     return `This action returns all customer`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customer`;
+  async findOne(id: number) {
+    try {
+      const result = await this._prisma.customer.findFirst({
+        where: {
+          id: id,
+        },
+      });
+
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 
-  update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    return `This action updates a #${id} customer`;
+  async update(id: number, updateCustomerDto: UpdateCustomerDto) {
+    try {
+      const result = await this._prisma.customer.update({
+        where: {
+          id: id,
+        },
+        data: updateCustomerDto,
+      });
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 
   remove(id: number) {
