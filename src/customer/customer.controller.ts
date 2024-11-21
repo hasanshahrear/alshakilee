@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -19,23 +20,25 @@ export class CustomerController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  create(@Body() createCustomerDto: CreateCustomerDto) {
+  async create(@Body() createCustomerDto: CreateCustomerDto) {
     return this.customerService.create(createCustomerDto);
   }
 
   @Get()
-  findAll() {
-    return this.customerService.findAll();
+  async findAll(@Query('page') page: string, @Query('limit') limit: string) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    return await this.customerService.findAll(pageNum, limitNum);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.customerService.findOne(+id);
   }
 
   @Patch(':id')
   @UsePipes(new ValidationPipe())
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
   ) {
@@ -43,7 +46,7 @@ export class CustomerController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.customerService.remove(+id);
   }
 }
