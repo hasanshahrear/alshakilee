@@ -4,21 +4,20 @@ import { LoggerService } from 'src/logger/logger.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpResponseException } from 'src/utils/exceptions';
 import { processHttpError } from 'src/utils/helper';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { CreateDesignTypeDto } from './dto/create-design-type.dto';
+import { UpdateDesignTypeDto } from './dto/update-design-type.dto';
 
 @Injectable()
-export class CustomerService {
+export class DesignTypeService {
   constructor(
     private readonly httpResponseService: HttpResponseService,
     private readonly logger: LoggerService,
     private readonly _prisma: PrismaService,
   ) {}
-
-  async create(createCustomerDto: CreateCustomerDto) {
+  async create(createDesignTypeDto: CreateDesignTypeDto) {
     try {
-      const result = await this._prisma.customer.create({
-        data: createCustomerDto,
+      const result = await this._prisma.design.create({
+        data: createDesignTypeDto,
       });
       return this.httpResponseService.generate(HttpStatus.CREATED, result);
     } catch (error) {
@@ -34,11 +33,11 @@ export class CustomerService {
       const offset = (page - 1) * limit;
 
       const [data, total] = await Promise.all([
-        this._prisma.customer.findMany({
+        this._prisma.design.findMany({
           skip: offset,
           take: limit,
         }),
-        this._prisma.customer.count(),
+        this._prisma.design.count(),
       ]);
 
       const totalPages = Math.ceil(total / limit);
@@ -62,7 +61,7 @@ export class CustomerService {
 
   async findOne(id: number) {
     try {
-      const result = await this._prisma.customer.findFirst({
+      const result = await this._prisma.design.findFirst({
         where: {
           id: id,
         },
@@ -73,7 +72,7 @@ export class CustomerService {
           this.httpResponseService.generate(
             HttpStatus.NOT_FOUND,
             null,
-            'Customer not found',
+            'Design Type not found',
           ),
         );
       }
@@ -87,13 +86,13 @@ export class CustomerService {
     }
   }
 
-  async update(id: number, updateCustomerDto: UpdateCustomerDto) {
+  async update(id: number, updateDesignTypeDto: UpdateDesignTypeDto) {
     try {
-      const result = await this._prisma.customer.update({
+      const result = await this._prisma.design.update({
         where: {
           id: id,
         },
-        data: updateCustomerDto,
+        data: updateDesignTypeDto,
       });
       return this.httpResponseService.generate(HttpStatus.OK, result);
     } catch (error) {
@@ -104,7 +103,7 @@ export class CustomerService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  async remove(id: number) {
+    return `This action removes a #${id} designType`;
   }
 }
