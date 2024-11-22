@@ -14,20 +14,22 @@ datasource db {
 }
 
 model Customer {
-  id       Int       @id @default(autoincrement())
-  mobile   String    @unique
-  name     String
-  invoices Invoice[]
+  id          Int           @id @default(autoincrement())
+  mobile      String        @unique
+  name        String
+  invoices    Invoice[]
+  InvoiceItem InvoiceItem[]
 }
 
 model Invoice {
-  id            Int           @id @default(autoincrement())
-  invoiceNumber String        @unique
-  customerId    Int
-  invoiceDate   DateTime
-  deliveryDate  DateTime
-  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  items         InvoiceItem[]
+  id              Int           @id @default(autoincrement())
+  invoiceNumber   String        @unique
+  customerId      Int
+  invoiceDate     DateTime
+  deliveryDate    DateTime
+  invoiceItemsIds Json
+  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items           InvoiceItem[]
 
   @@index([customerId])
 }
@@ -46,7 +48,6 @@ model BottomType {
 
 model InvoiceItem {
   id           Int         @id @default(autoincrement())
-  invoiceId    Int
   designTypeId Int
   bottomTypeId Int
   quantity     Int         @default(1)
@@ -60,12 +61,15 @@ model InvoiceItem {
   pocketStyle  PocketStyle
   sewingType   SewingType
   sdType       SDType
+  customerId   Int
+  invoiceId    Int?
 
-  invoice    Invoice    @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   designType Design     @relation(fields: [designTypeId], references: [id], onDelete: Restrict)
   bottomType BottomType @relation(fields: [bottomTypeId], references: [id], onDelete: Restrict)
+  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  Invoice    Invoice?   @relation(fields: [invoiceId], references: [id])
 
-  @@index([invoiceId, designTypeId, bottomTypeId])
+  @@index([designTypeId, bottomTypeId, customerId])
 }
 
 enum PocketStyle {
