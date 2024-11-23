@@ -17,32 +17,38 @@ model Customer {
   id          Int           @id @default(autoincrement())
   mobile      String        @unique
   name        String
+  isActive    Boolean       @default(true)
   invoices    Invoice[]
   InvoiceItem InvoiceItem[]
 }
 
 model Invoice {
-  id              Int           @id @default(autoincrement())
-  invoiceNumber   String        @unique
+  id              Int      @id @default(autoincrement())
+  invoiceNumber   String   @unique
   customerId      Int
   invoiceDate     DateTime
   deliveryDate    DateTime
   invoiceItemsIds Json
-  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  items           InvoiceItem[]
+  isActive        Boolean  @default(true)
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
 }
 
 model Design {
-  id    Int           @id @default(autoincrement())
-  name  String        @unique
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
+
   items InvoiceItem[]
 }
 
 model BottomType {
-  id    Int           @id @default(autoincrement())
-  name  String        @unique
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
+
   items InvoiceItem[]
 }
 
@@ -62,12 +68,11 @@ model InvoiceItem {
   sewingType   SewingType
   sdType       SDType
   customerId   Int
-  invoiceId    Int?
+  isActive     Boolean     @default(true)
 
   designType Design     @relation(fields: [designTypeId], references: [id], onDelete: Restrict)
   bottomType BottomType @relation(fields: [bottomTypeId], references: [id], onDelete: Restrict)
   customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  Invoice    Invoice?   @relation(fields: [invoiceId], references: [id])
 
   @@index([designTypeId, bottomTypeId, customerId])
 }
