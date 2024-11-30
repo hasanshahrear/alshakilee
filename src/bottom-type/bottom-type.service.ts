@@ -36,6 +36,9 @@ export class BottomTypeService {
         this._prisma.bottomType.findMany({
           skip: offset,
           take: limit,
+          orderBy: {
+            id: 'desc',
+          },
         }),
         this._prisma.bottomType.count(),
       ]);

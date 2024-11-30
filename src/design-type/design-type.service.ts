@@ -36,6 +36,9 @@ export class DesignTypeService {
         this._prisma.design.findMany({
           skip: offset,
           take: limit,
+          orderBy: {
+            id: 'desc',
+          },
         }),
         this._prisma.design.count(),
       ]);
