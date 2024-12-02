@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -30,26 +24,23 @@ model Invoice {
   deliveryDate    DateTime
   invoiceItemsIds Json
   isActive        Boolean  @default(true)
-
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
 }
 
 model Design {
-  id       Int     @id @default(autoincrement())
-  name     String  @unique
-  isActive Boolean @default(true)
-
-  items InvoiceItem[]
+  id       Int           @id @default(autoincrement())
+  name     String        @unique
+  isActive Boolean       @default(true)
+  items    InvoiceItem[]
 }
 
 model BottomType {
-  id       Int     @id @default(autoincrement())
-  name     String  @unique
-  isActive Boolean @default(true)
-
-  items InvoiceItem[]
+  id       Int           @id @default(autoincrement())
+  name     String        @unique
+  isActive Boolean       @default(true)
+  items    InvoiceItem[]
 }
 
 model InvoiceItem {
@@ -69,10 +60,9 @@ model InvoiceItem {
   sdType       SDType
   customerId   Int
   isActive     Boolean     @default(true)
-
-  designType Design     @relation(fields: [designTypeId], references: [id], onDelete: Restrict)
-  bottomType BottomType @relation(fields: [bottomTypeId], references: [id], onDelete: Restrict)
-  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  bottomType   BottomType  @relation(fields: [bottomTypeId], references: [id])
+  customer     Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  designType   Design      @relation(fields: [designTypeId], references: [id])
 
   @@index([designTypeId, bottomTypeId, customerId])
 }

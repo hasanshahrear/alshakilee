@@ -104,7 +104,22 @@ export class CustomerService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  async remove(id: number) {
+    try {
+      const result = await this._prisma.customer.update({
+        where: {
+          id: id,
+        },
+        data: {
+          isActive: false,
+        },
+      });
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 }
