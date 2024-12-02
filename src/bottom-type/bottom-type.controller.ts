@@ -1,19 +1,22 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseBoolPipe,
   Patch,
   Post,
+  Put,
   Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { BottomTypeService } from './bottom-type.service';
 import { CreateBottomTypeDto } from './dto/create-bottom-type.dto';
-import { UpdateBottomTypeDto } from './dto/update-bottom-type.dto';
+import {
+  PatchBottomTypeDto,
+  UpdateBottomTypeDto,
+} from './dto/update-bottom-type.dto';
 
 @Controller('bottom-type')
 export class BottomTypeController {
@@ -41,7 +44,7 @@ export class BottomTypeController {
     return this.bottomTypeService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateBottomTypeDto: UpdateBottomTypeDto,
@@ -49,8 +52,11 @@ export class BottomTypeController {
     return this.bottomTypeService.update(+id, updateBottomTypeDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.bottomTypeService.remove(+id);
+  @Patch(':id')
+  async remove(
+    @Param('id') id: string,
+    @Body() patchBottomTypeDto: PatchBottomTypeDto,
+  ) {
+    return this.bottomTypeService.remove(+id, patchBottomTypeDto);
   }
 }
