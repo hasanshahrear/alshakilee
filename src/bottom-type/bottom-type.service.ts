@@ -5,7 +5,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpResponseException } from 'src/utils/exceptions';
 import { processHttpError } from 'src/utils/helper';
 import { CreateBottomTypeDto } from './dto/create-bottom-type.dto';
-import { UpdateBottomTypeDto } from './dto/update-bottom-type.dto';
+import {
+  PatchBottomTypeDto,
+  UpdateBottomTypeDto,
+} from './dto/update-bottom-type.dto';
 
 @Injectable()
 export class BottomTypeService {
@@ -109,14 +112,14 @@ export class BottomTypeService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, patchBottomTypeDto: PatchBottomTypeDto) {
     try {
       const result = await this._prisma.bottomType.update({
         where: {
           id: id,
         },
         data: {
-          isActive: false,
+          isActive: patchBottomTypeDto?.isActive,
         },
       });
       return this.httpResponseService.generate(HttpStatus.OK, result);
