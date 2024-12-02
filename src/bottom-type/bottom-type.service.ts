@@ -28,7 +28,7 @@ export class BottomTypeService {
     }
   }
 
-  async findAll(page: number = 1, limit: number = 10) {
+  async findAll(page: number = 1, limit: number = 10, status = true) {
     try {
       const offset = (page - 1) * limit;
 
@@ -38,6 +38,9 @@ export class BottomTypeService {
           take: limit,
           orderBy: {
             id: 'desc',
+          },
+          where: {
+            isActive: status,
           },
         }),
         this._prisma.bottomType.count(),
