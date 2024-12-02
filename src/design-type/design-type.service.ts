@@ -107,6 +107,21 @@ export class DesignTypeService {
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} designType`;
+    try {
+      const result = await this._prisma.design.update({
+        where: {
+          id: id,
+        },
+        data: {
+          isActive: false,
+        },
+      });
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 }
