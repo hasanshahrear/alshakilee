@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseBoolPipe,
   Patch,
   Post,
   Put,
@@ -25,10 +26,14 @@ export class CustomerController {
   }
 
   @Get()
-  async findAll(@Query('page') page: string, @Query('limit') limit: string) {
+  async findAll(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('status', new ParseBoolPipe()) status: boolean,
+  ) {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
-    return await this.customerService.findAll(pageNum, limitNum);
+    return await this.customerService.findAll(pageNum, limitNum, status);
   }
 
   @Get(':id')
