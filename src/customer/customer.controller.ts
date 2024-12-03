@@ -1,18 +1,18 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Post,
+  Put,
   Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { PatchCustomerDto, UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Controller('customer')
 export class CustomerController {
@@ -36,7 +36,7 @@ export class CustomerController {
     return this.customerService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @UsePipes(new ValidationPipe())
   async update(
     @Param('id') id: string,
@@ -45,8 +45,11 @@ export class CustomerController {
     return this.customerService.update(+id, updateCustomerDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.customerService.remove(+id);
+  @Patch(':id')
+  async remove(
+    @Param('id') id: string,
+    @Body() patchCustomerDto: PatchCustomerDto,
+  ) {
+    return this.customerService.remove(+id, patchCustomerDto);
   }
 }

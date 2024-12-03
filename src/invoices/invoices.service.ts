@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpResponseException } from 'src/utils/exceptions';
 import { processHttpError } from 'src/utils/helper';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
-import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { PatchInvoiceDto, UpdateInvoiceDto } from './dto/update-invoice.dto';
 
 @Injectable()
 export class InvoicesService {
@@ -62,14 +62,14 @@ export class InvoicesService {
     return `This action updates a #${id} invoice`;
   }
 
-  async remove(id: number) {
+  async remove(id: number, patchInvoiceDto: PatchInvoiceDto) {
     try {
       const result = await this._prisma.invoice.update({
         where: {
           id: id,
         },
         data: {
-          isActive: false,
+          isActive: patchInvoiceDto?.isActive,
         },
       });
       return this.httpResponseService.generate(HttpStatus.OK, result);

@@ -5,7 +5,10 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpResponseException } from 'src/utils/exceptions';
 import { processHttpError } from 'src/utils/helper';
 import { CreateDesignTypeDto } from './dto/create-design-type.dto';
-import { UpdateDesignTypeDto } from './dto/update-design-type.dto';
+import {
+  PatchDesignTypeDto,
+  UpdateDesignTypeDto,
+} from './dto/update-design-type.dto';
 
 @Injectable()
 export class DesignTypeService {
@@ -106,14 +109,14 @@ export class DesignTypeService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, patchDesignTypeDto: PatchDesignTypeDto) {
     try {
-      const result = await this._prisma.design.update({
+      const result = await this._prisma.bottomType.update({
         where: {
           id: id,
         },
         data: {
-          isActive: false,
+          isActive: patchDesignTypeDto?.isActive,
         },
       });
       return this.httpResponseService.generate(HttpStatus.OK, result);

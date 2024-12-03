@@ -1,16 +1,16 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Post,
+  Put,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
-import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { PatchInvoiceDto, UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { InvoicesService } from './invoices.service';
 
 @Controller('invoices')
@@ -33,7 +33,7 @@ export class InvoicesController {
     return this.invoicesService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateInvoiceDto: UpdateInvoiceDto,
@@ -41,8 +41,11 @@ export class InvoicesController {
     return this.invoicesService.update(+id, updateInvoiceDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.invoicesService.remove(+id);
+  @Patch(':id')
+  async remove(
+    @Param('id') id: string,
+    @Body() patchInvoiceDto: PatchInvoiceDto,
+  ) {
+    return this.invoicesService.remove(+id, patchInvoiceDto);
   }
 }
