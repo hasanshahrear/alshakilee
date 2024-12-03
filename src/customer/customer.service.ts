@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpResponseException } from 'src/utils/exceptions';
 import { processHttpError } from 'src/utils/helper';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { PatchCustomerDto, UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -104,14 +104,14 @@ export class CustomerService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number, patchCustomerDto: PatchCustomerDto) {
     try {
-      const result = await this._prisma.customer.update({
+      const result = await this._prisma.bottomType.update({
         where: {
           id: id,
         },
         data: {
-          isActive: false,
+          isActive: patchCustomerDto?.isActive,
         },
       });
       return this.httpResponseService.generate(HttpStatus.OK, result);

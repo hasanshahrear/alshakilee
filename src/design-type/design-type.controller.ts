@@ -1,18 +1,21 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Post,
+  Put,
   Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { DesignTypeService } from './design-type.service';
 import { CreateDesignTypeDto } from './dto/create-design-type.dto';
-import { UpdateDesignTypeDto } from './dto/update-design-type.dto';
+import {
+  PatchDesignTypeDto,
+  UpdateDesignTypeDto,
+} from './dto/update-design-type.dto';
 
 @Controller('design-type')
 export class DesignTypeController {
@@ -36,7 +39,7 @@ export class DesignTypeController {
     return this.designTypeService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateDesignTypeDto: UpdateDesignTypeDto,
@@ -44,8 +47,11 @@ export class DesignTypeController {
     return this.designTypeService.update(+id, updateDesignTypeDto);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.designTypeService.remove(+id);
+  @Patch(':id')
+  async remove(
+    @Param('id') id: string,
+    @Body() patchDesignTypeDto: PatchDesignTypeDto,
+  ) {
+    return this.designTypeService.remove(+id, patchDesignTypeDto);
   }
 }
