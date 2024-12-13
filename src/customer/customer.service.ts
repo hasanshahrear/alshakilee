@@ -44,7 +44,11 @@ export class CustomerService {
             isActive: status,
           },
         }),
-        this._prisma.customer.count(),
+        this._prisma.customer.count({
+          where: {
+            isActive: status,
+          },
+        }),
       ]);
 
       const totalPages = Math.ceil(total / limit);

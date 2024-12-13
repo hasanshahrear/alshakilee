@@ -46,7 +46,11 @@ export class BottomTypeService {
             isActive: status,
           },
         }),
-        this._prisma.bottomType.count(),
+        this._prisma.bottomType.count({
+          where: {
+            isActive: status,
+          },
+        }),
       ]);
 
       const totalPages = Math.ceil(total / limit);
