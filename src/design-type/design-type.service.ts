@@ -46,7 +46,11 @@ export class DesignTypeService {
             isActive: status,
           },
         }),
-        this._prisma.design.count(),
+        this._prisma.design.count({
+          where: {
+            isActive: status,
+          },
+        }),
       ]);
 
       const totalPages = Math.ceil(total / limit);
