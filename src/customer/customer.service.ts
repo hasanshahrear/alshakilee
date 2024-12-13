@@ -116,7 +116,7 @@ export class CustomerService {
 
   async remove(id: number, patchCustomerDto: PatchCustomerDto) {
     try {
-      const result = await this._prisma.bottomType.update({
+      const result = await this._prisma.customer.update({
         where: {
           id: id,
         },
