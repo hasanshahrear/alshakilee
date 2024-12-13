@@ -118,7 +118,7 @@ export class DesignTypeService {
 
   async remove(id: number, patchDesignTypeDto: PatchDesignTypeDto) {
     try {
-      const result = await this._prisma.bottomType.update({
+      const result = await this._prisma.design.update({
         where: {
           id: id,
         },
