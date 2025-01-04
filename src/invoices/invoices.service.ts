@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { isValid, parseISO } from 'date-fns';
 import { HttpResponseService } from 'src/http-response/http-response.service';
 import { LoggerService } from 'src/logger/logger.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -50,8 +51,134 @@ export class InvoicesService {
     }
   }
 
-  async findAll() {
-    return `This action returns all invoices`;
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    status = true,
+    queryString: string,
+  ) {
+    try {
+      const offset = (page - 1) * limit;
+
+      const [data, total] = await Promise.all([
+        this._prisma.invoice.findMany({
+          skip: offset,
+          take: limit,
+          orderBy: {
+            id: 'desc',
+          },
+          where: {
+            isActive: status,
+            ...(queryString && {
+              OR: [
+                {
+                  invoiceNumber: {
+                    contains: queryString,
+                    mode: 'insensitive',
+                  },
+                },
+                ...(isValid(parseISO(queryString))
+                  ? [
+                      {
+                        deliveryDate: {
+                          equals: new Date(queryString),
+                        },
+                      },
+                      {
+                        invoiceDate: {
+                          equals: new Date(queryString),
+                        },
+                      },
+                    ]
+                  : []),
+                {
+                  customer: {
+                    mobile: {
+                      contains: queryString,
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              ],
+            }),
+          },
+          include: {
+            customer: true,
+          },
+        }),
+        this._prisma.invoice.count({
+          where: {
+            isActive: status,
+            ...(queryString && {
+              OR: [
+                {
+                  invoiceNumber: {
+                    contains: queryString,
+                    mode: 'insensitive',
+                  },
+                },
+                ...(isValid(parseISO(queryString))
+                  ? [
+                      {
+                        deliveryDate: {
+                          equals: new Date(queryString),
+                        },
+                      },
+                      {
+                        invoiceDate: {
+                          equals: new Date(queryString),
+                        },
+                      },
+                    ]
+                  : []),
+                {
+                  customer: {
+                    mobile: {
+                      contains: queryString,
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              ],
+            }),
+          },
+        }),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+
+      const invoicesWithItems = await Promise.all(
+        data.map(async (invoice) => {
+          const invoiceItems = await this._prisma.invoiceItem.findMany({
+            where: {
+              id: {
+                in: invoice.invoiceItemsIds as number[],
+              },
+            },
+          });
+
+          return {
+            ...invoice,
+            items: invoiceItems,
+          };
+        }),
+      );
+
+      return this.httpResponseService.generate(HttpStatus.OK, {
+        data: invoicesWithItems,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 
   async findOne(id: number) {

@@ -33,7 +33,7 @@ export class CustomerService {
     page: number = 1,
     limit: number = 10,
     status = true,
-    queryString,
+    queryString: string,
   ) {
     try {
       const offset = (page - 1) * limit;
