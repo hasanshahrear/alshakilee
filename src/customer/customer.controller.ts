@@ -36,7 +36,7 @@ export class CustomerController {
     @Query('page') page: string,
     @Query('limit') limit: string,
     @Query('status', new ParseBoolPipe()) status: boolean,
-    @Query('queryString') queryString: string,
+    @Query('queryString') queryString?: string,
   ) {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
