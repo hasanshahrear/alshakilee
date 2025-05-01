@@ -74,7 +74,6 @@ export class InvoicesService {
                 {
                   invoiceNumber: {
                     contains: queryString,
-                    mode: 'insensitive',
                   },
                 },
                 ...(isValid(parseISO(queryString))
@@ -95,7 +94,6 @@ export class InvoicesService {
                   customer: {
                     mobile: {
                       contains: queryString,
-                      mode: 'insensitive',
                     },
                   },
                 },
@@ -114,7 +112,6 @@ export class InvoicesService {
                 {
                   invoiceNumber: {
                     contains: queryString,
-                    mode: 'insensitive',
                   },
                 },
                 ...(isValid(parseISO(queryString))
@@ -135,7 +132,6 @@ export class InvoicesService {
                   customer: {
                     mobile: {
                       contains: queryString,
-                      mode: 'insensitive',
                     },
                   },
                 },

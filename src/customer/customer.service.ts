@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { HttpResponseService } from 'src/http-response/http-response.service';
 import { LoggerService } from 'src/logger/logger.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -38,6 +39,23 @@ export class CustomerService {
     try {
       const offset = (page - 1) * limit;
 
+      const searchFilter: Prisma.CustomerWhereInput | undefined = queryString
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: queryString,
+                },
+              },
+              {
+                mobile: {
+                  contains: queryString,
+                },
+              },
+            ],
+          }
+        : undefined;
+
       const [data, total] = await Promise.all([
         this._prisma.customer.findMany({
           skip: offset,
@@ -47,43 +65,13 @@ export class CustomerService {
           },
           where: {
             isActive: status,
-            ...(queryString && {
-              OR: [
-                {
-                  name: {
-                    contains: queryString,
-                    mode: 'insensitive',
-                  },
-                },
-                {
-                  mobile: {
-                    contains: queryString,
-                    mode: 'insensitive',
-                  },
-                },
-              ],
-            }),
+            ...searchFilter,
           },
         }),
         this._prisma.customer.count({
           where: {
             isActive: status,
-            ...(queryString && {
-              OR: [
-                {
-                  name: {
-                    contains: queryString,
-                    mode: 'insensitive',
-                  },
-                },
-                {
-                  mobile: {
-                    contains: queryString,
-                    mode: 'insensitive',
-                  },
-                },
-              ],
-            }),
+            ...searchFilter,
           },
         }),
       ]);
