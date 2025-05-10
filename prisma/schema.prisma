@@ -10,10 +10,9 @@ datasource db {
 model Customer {
   id          Int           @id @default(autoincrement())
   mobile      String        @unique
-  name        String
   isActive    Boolean       @default(true)
+
   invoices    Invoice[]
-  InvoiceItem InvoiceItem[]
 }
 
 model Invoice {
@@ -22,62 +21,59 @@ model Invoice {
   customerId      Int
   invoiceDate     DateTime
   deliveryDate    DateTime
-  invoiceItemsIds Json
   isActive        Boolean  @default(true)
+  
   customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  @@index([customerId])
-}
-
-model Design {
-  id       Int           @id @default(autoincrement())
-  name     String        @unique
-  isActive Boolean       @default(true)
-  items    InvoiceItem[]
-}
-
-model BottomType {
-  id       Int           @id @default(autoincrement())
-  name     String        @unique
-  isActive Boolean       @default(true)
-  items    InvoiceItem[]
+  invoiceItems    InvoiceItem[]
+  @@index([customerId, invoiceDate, deliveryDate, invoiceNumber])
 }
 
 model InvoiceItem {
-  id           Int         @id @default(autoincrement())
-  designTypeId Int
-  bottomTypeId Int
-  quantity     Int         @default(1)
-  length       Float
-  shoulder     Float
-  hand         Float
-  handLouse    Float
-  neck         Float
-  neckLouse    Float
-  centreLouse  Float
-  pocketStyle  PocketStyle
-  sewingType   SewingType
-  sdType       SDType
-  customerId   Int
+  id           Int         @id @default(autoincrement())  
+  length        Float
+  shoulder      Float
+  hand          Float
+  handLoose     Float
+  neck          Float
+  loose         Float
+  centreLoose   Float
+  bottom        Float
+  open          Float
+  button        String
+  design        String
+  pocket        EPocketStyle
+  sewing        ESewingType
+  sd            ESDType  
+  pan           EPanType  
+  description   String?    
+  quantity      Int
+  price         Float
+ 
   isActive     Boolean     @default(true)
-  bottomType   BottomType  @relation(fields: [bottomTypeId], references: [id])
-  customer     Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  designType   Design      @relation(fields: [designTypeId], references: [id])
+  invoiceId     Int?      
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  @@index([designTypeId, bottomTypeId, customerId])
+  invoice       Invoice?   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  @@index([invoiceId])
 }
 
-enum PocketStyle {
+enum EPocketStyle {
   P2
   P2_Bag
 }
 
-enum SewingType {
+enum ESewingType {
   Chap
   Lock
 }
 
-enum SDType {
+enum ESDType {
   SD
   No_SD
+}
+
+enum EPanType {
+  Pan
+  NO_PAN
 }
