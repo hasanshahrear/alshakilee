@@ -60,20 +60,20 @@ model InvoiceItem {
 
 enum EPocketStyle {
   P2
-  P2_Bag
+  P2_BAG
 }
 
 enum ESewingType {
-  Chap
-  Lock
+  CHAP
+  LOCK
 }
 
 enum ESDType {
   SD
-  No_SD
+  NO_SD
 }
 
 enum EPanType {
-  Pan
+  PAN
   NO_PAN
 }
