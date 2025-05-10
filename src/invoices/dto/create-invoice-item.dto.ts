@@ -1,33 +1,15 @@
-import { IsEnum, IsInt, IsNumber, IsPositive, Min } from 'class-validator';
-
-export enum PocketStyle {
-  P2 = 'P2',
-  P2_Bag = 'P2_Bag',
-}
-
-export enum SewingType {
-  Chap = 'Chap',
-  Lock = 'Lock',
-}
-
-export enum SDType {
-  SD = 'SD',
-  No_SD = 'No_SD',
-}
+import { EPanType, EPocketStyle, ESDType, ESewingType } from '@prisma/client';
+import {
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateItemDto {
-  @IsInt()
-  @IsPositive()
-  designTypeId: number;
-
-  @IsInt()
-  @IsPositive()
-  bottomTypeId: number;
-
-  @IsInt()
-  @IsPositive()
-  quantity: number;
-
   @IsNumber()
   @Min(0)
   length: number;
@@ -42,7 +24,7 @@ export class CreateItemDto {
 
   @IsNumber()
   @Min(0)
-  handLouse: number;
+  handLoose: number;
 
   @IsNumber()
   @Min(0)
@@ -50,18 +32,47 @@ export class CreateItemDto {
 
   @IsNumber()
   @Min(0)
-  neckLouse: number;
+  loose: number;
 
   @IsNumber()
   @Min(0)
-  centreLouse: number;
+  centreLoose: number;
 
-  @IsEnum(PocketStyle)
-  pocketStyle: PocketStyle;
+  @IsNumber()
+  @Min(0)
+  bottom: number;
 
-  @IsEnum(SewingType)
-  sewingType: SewingType;
+  @IsNumber()
+  @Min(0)
+  open: number;
 
-  @IsEnum(SDType)
-  sdType: SDType;
+  @IsString()
+  button: string;
+
+  @IsString()
+  design: string;
+
+  @IsEnum(EPocketStyle)
+  pocket: EPocketStyle;
+
+  @IsEnum(ESewingType)
+  sewing: ESewingType;
+
+  @IsEnum(ESDType)
+  sd: ESDType;
+
+  @IsEnum(EPanType)
+  pan: EPanType;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsInt()
+  @IsPositive()
+  quantity: number;
+
+  @IsNumber()
+  @Min(0)
+  price: number;
 }

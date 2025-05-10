@@ -15,31 +15,21 @@ export class InvoicesService {
     private readonly logger: LoggerService,
     private readonly _prisma: PrismaService,
   ) {}
-  async create(createInvoiceDto: CreateInvoiceDto) {
-    const insertedInvoiceItems: number[] = [];
-    try {
-      await this._prisma.$transaction(async (prisma) => {
-        for (const item of createInvoiceDto?.items || []) {
-          const insertedItem = await prisma.invoiceItem.create({
-            data: {
-              ...item,
-              customerId: createInvoiceDto?.customerId,
-            },
-          });
-          insertedInvoiceItems.push(insertedItem?.id);
-        }
 
-        await prisma.invoice.create({
-          data: {
-            invoiceNumber: new Date().toISOString(),
-            invoiceDate: new Date().toISOString(),
-            deliveryDate: new Date(
-              createInvoiceDto?.deliveryDate,
-            ).toISOString(),
-            customerId: createInvoiceDto?.customerId,
-            invoiceItemsIds: insertedInvoiceItems,
+  async create(createInvoiceDto: CreateInvoiceDto) {
+    try {
+      await this._prisma.invoice.create({
+        data: {
+          invoiceNumber: new Date().toISOString(),
+          invoiceDate: new Date(),
+          deliveryDate: new Date(createInvoiceDto.deliveryDate),
+          customerId: createInvoiceDto.customerId,
+          invoiceItems: {
+            create: createInvoiceDto.items.map((item) => ({
+              ...item,
+            })),
           },
-        });
+        },
       });
 
       return this.httpResponseService.generate(HttpStatus.CREATED, null);
@@ -146,11 +136,7 @@ export class InvoicesService {
       const invoicesWithItems = await Promise.all(
         data.map(async (invoice) => {
           const invoiceItems = await this._prisma.invoiceItem.findMany({
-            where: {
-              id: {
-                in: invoice.invoiceItemsIds as number[],
-              },
-            },
+            where: {},
           });
 
           return {

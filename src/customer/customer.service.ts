@@ -43,11 +43,6 @@ export class CustomerService {
         ? {
             OR: [
               {
-                name: {
-                  contains: queryString,
-                },
-              },
-              {
                 mobile: {
                   contains: queryString,
                 },
@@ -131,7 +126,7 @@ export class CustomerService {
         },
       });
 
-      const totalNumberOfInvoice = await this._prisma.invoiceItem.count({
+      const totalNumberOfInvoice = await this._prisma.invoice.count({
         where: {
           customerId: customerInfo?.id,
         },
