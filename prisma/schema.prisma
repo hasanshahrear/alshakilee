@@ -37,7 +37,7 @@ model InvoiceItem {
   neck          Float
   loose         Float
   centreLoose   Float
-  bottom        Float
+  downLoose     Float
   open          Float
   button        String
   design        String
@@ -71,6 +71,7 @@ enum ESewingType {
 enum ESDType {
   SD
   NO_SD
+  KT
 }
 
 enum EPanType {
