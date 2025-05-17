@@ -40,7 +40,7 @@ export class CreateItemDto {
 
   @IsNumber()
   @Min(0)
-  bottom: number;
+  downLoose: number;
 
   @IsNumber()
   @Min(0)
