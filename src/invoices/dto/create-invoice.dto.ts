@@ -10,6 +10,8 @@ import {
 import { CreateItemDto } from './create-invoice-item.dto';
 
 export class CreateInvoiceDto {
+  id?: number;
+
   @IsInt()
   @IsPositive()
   customerId: number;
