@@ -131,11 +131,115 @@ export class InvoicesService {
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} invoice`;
+    const invoice = await this._prisma.invoice.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        customer: true,
+        invoiceItems: true,
+      },
+    });
+    if (!invoice) {
+      throw new HttpResponseException(
+        this.httpResponseService.generate(
+          HttpStatus.NOT_FOUND,
+          null,
+          'Invoice not found',
+        ),
+      );
+    }
+    return this.httpResponseService.generate(HttpStatus.OK, invoice);
   }
 
   async update(id: number, updateInvoiceDto: UpdateInvoiceDto) {
-    return `This action updates a #${id} invoice`;
+    try {
+      const existingInvoice = await this._prisma.invoice.findUnique({
+        where: { id },
+        include: { invoiceItems: true },
+      });
+
+      if (!existingInvoice) {
+        throw new HttpResponseException(
+          this.httpResponseService.generate(
+            HttpStatus.NOT_FOUND,
+            null,
+            'Invoice not found',
+          ),
+        );
+      }
+
+      const payloadItemIds = updateInvoiceDto.items
+        .filter((item) => item.id)
+        .map((item) => item.id);
+
+      const existingItemIds = existingInvoice.invoiceItems.map(
+        (item) => item.id,
+      );
+
+      const itemsToDelete = existingItemIds.filter(
+        (itemId) => !payloadItemIds.includes(itemId),
+      );
+
+      const itemsToUpdate = updateInvoiceDto.items.filter(
+        (item) => item.id && existingItemIds.includes(item.id),
+      );
+
+      const itemsToCreate = updateInvoiceDto.items.filter((item) => !item.id);
+
+      // 1. Update main invoice
+      await this._prisma.invoice.update({
+        where: { id },
+        data: {
+          invoiceDate: new Date().toISOString(),
+          deliveryDate: updateInvoiceDto.deliveryDate
+            ? new Date(updateInvoiceDto.deliveryDate).toISOString()
+            : undefined,
+          customerId: updateInvoiceDto.customerId,
+        },
+      });
+
+      // 2. Delete removed items
+      if (itemsToDelete.length) {
+        await this._prisma.invoiceItem.deleteMany({
+          where: { id: { in: itemsToDelete } },
+        });
+      }
+
+      // 3. Update existing items
+      await Promise.all(
+        itemsToUpdate.map((item) =>
+          this._prisma.invoiceItem.update({
+            where: { id: item.id },
+            data: {
+              ...item,
+              invoiceId: id,
+            },
+          }),
+        ),
+      );
+
+      // 4. Create new items
+      if (itemsToCreate.length) {
+        await this._prisma.invoiceItem.createMany({
+          data: itemsToCreate.map((item) => ({
+            ...item,
+            invoiceId: id,
+          })),
+        });
+      }
+
+      return this.httpResponseService.generate(
+        HttpStatus.OK,
+        null,
+        'Invoice updated successfully',
+      );
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 
   async remove(id: number, patchInvoiceDto: PatchInvoiceDto) {

@@ -10,6 +10,8 @@ import {
 } from 'class-validator';
 
 export class CreateItemDto {
+  id?: number;
+
   @IsNumber()
   @Min(0)
   length: number;
