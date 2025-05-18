@@ -24,9 +24,8 @@ export class CreateItemDto {
   @Min(0)
   hand: number;
 
-  @IsNumber()
-  @Min(0)
-  handLoose: number;
+  @IsString()
+  handLoose: string;
 
   @IsNumber()
   @Min(0)
@@ -34,11 +33,10 @@ export class CreateItemDto {
 
   @IsNumber()
   @Min(0)
-  loose: number;
+  chestLoose: number;
 
-  @IsNumber()
-  @Min(0)
-  centreLoose: number;
+  @IsString()
+  centreLoose: string;
 
   @IsNumber()
   @Min(0)
@@ -50,6 +48,9 @@ export class CreateItemDto {
 
   @IsString()
   button: string;
+
+  @IsString()
+  fabric: string;
 
   @IsString()
   design: string;

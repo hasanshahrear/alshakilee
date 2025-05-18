@@ -33,10 +33,10 @@ model InvoiceItem {
   length        Float
   shoulder      Float
   hand          Float
-  handLoose     Float
+  handLoose     String
   neck          Float
-  loose         Float
-  centreLoose   Float
+  chestLoose    Float
+  centreLoose   String
   downLoose     Float
   open          Float
   button        String
@@ -48,6 +48,8 @@ model InvoiceItem {
   description   String?    
   quantity      Int
   price         Float
+  fabric        String
+
  
   isActive     Boolean     @default(true)
   invoiceId     Int?      
