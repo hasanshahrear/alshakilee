@@ -119,25 +119,32 @@ export class CustomerService {
 
   async findByMobile(mobile: string) {
     try {
-      const customerInfo = await this._prisma.customer.findFirst({
-        where: {
-          mobile: mobile,
-          isActive: true,
-        },
-      });
+      let customers;
+      if (mobile) {
+        customers = await this._prisma.customer.findMany({
+          where: {
+            mobile: {
+              contains: mobile,
+            },
+            isActive: true,
+          },
+          orderBy: {
+            id: 'desc',
+          },
+        });
+      } else {
+        customers = await this._prisma.customer.findMany({
+          where: {
+            isActive: true,
+          },
+          take: 6,
+          orderBy: {
+            id: 'desc',
+          },
+        });
+      }
 
-      const totalNumberOfInvoice = await this._prisma.invoice.count({
-        where: {
-          customerId: customerInfo?.id,
-        },
-      });
-
-      const result = {
-        ...customerInfo,
-        totalNumberOfInvoice,
-      };
-
-      if (!result) {
+      if (!customers || customers.length === 0) {
         throw new HttpResponseException(
           this.httpResponseService.generate(
             HttpStatus.NOT_FOUND,
@@ -147,7 +154,7 @@ export class CustomerService {
         );
       }
 
-      return this.httpResponseService.generate(HttpStatus.OK, result);
+      return this.httpResponseService.generate(HttpStatus.OK, customers);
     } catch (error) {
       processHttpError(error, this.logger);
       throw new HttpResponseException(

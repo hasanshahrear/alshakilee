@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpStatus,
   Param,
   ParseBoolPipe,
   Patch,
@@ -13,7 +12,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { HttpResponseService } from 'src/http-response/http-response.service';
-import { HttpResponseException } from 'src/utils/exceptions';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { PatchCustomerDto, UpdateCustomerDto } from './dto/update-customer.dto';
@@ -49,16 +47,7 @@ export class CustomerController {
   }
 
   @Get('mobile')
-  async findByMobile(@Query('mobile') mobile: string) {
-    if (!mobile) {
-      throw new HttpResponseException(
-        this.httpResponseService.generate(
-          HttpStatus.BAD_REQUEST,
-          null,
-          'Mobile number is required',
-        ),
-      );
-    }
+  async findByMobile(@Query('mobile') mobile?: string) {
     return this.customerService.findByMobile(mobile);
   }
 
