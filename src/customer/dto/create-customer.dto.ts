@@ -4,4 +4,8 @@ export class CreateCustomerDto {
   @IsString()
   @IsNotEmpty()
   mobile: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 }

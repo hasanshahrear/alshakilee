@@ -53,6 +53,9 @@ export class CreateItemDto {
   fabric: string;
 
   @IsString()
+  name: string;
+
+  @IsString()
   design: string;
 
   @IsEnum(EPocketStyle)
@@ -74,8 +77,4 @@ export class CreateItemDto {
   @IsInt()
   @IsPositive()
   quantity: number;
-
-  @IsNumber()
-  @Min(0)
-  price: number;
 }

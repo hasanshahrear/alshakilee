@@ -12,7 +12,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
-import { PatchInvoiceDto, UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { InvoicesService } from './invoices.service';
 
 @Controller('invoices')
@@ -34,12 +34,7 @@ export class InvoicesController {
   ) {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
-    return await this.invoicesService.findAll(
-      pageNum,
-      limitNum,
-      status,
-      queryString,
-    );
+    return await this.invoicesService.findAll(pageNum, limitNum, queryString);
   }
 
   @Get(':id')
@@ -55,11 +50,13 @@ export class InvoicesController {
     return this.invoicesService.update(+id, updateInvoiceDto);
   }
 
+  @Patch('/status/:id')
+  async updateStatus(@Param('id') id: string, @Body('status') status: number) {
+    return this.invoicesService.updateStatus(+id, status);
+  }
+
   @Patch(':id')
-  async remove(
-    @Param('id') id: string,
-    @Body() patchInvoiceDto: PatchInvoiceDto,
-  ) {
-    return this.invoicesService.remove(+id, patchInvoiceDto);
+  async remove(@Param('id') id: string) {
+    return this.invoicesService.remove(+id);
   }
 }

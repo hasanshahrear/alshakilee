@@ -20,6 +20,12 @@ export class CreateInvoiceDto {
   @IsDateString({ strict: true })
   deliveryDate: string;
 
+  totalPrice?: number;
+
+  discountAmount?: number;
+
+  advanceAmount?: number;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateItemDto)

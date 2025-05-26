@@ -8,60 +8,79 @@ datasource db {
 }
 
 model Customer {
-  id          Int           @id @default(autoincrement())
-  mobile      String        @unique
-  isActive    Boolean       @default(true)
+  id       Int     @id @default(autoincrement())
+  mobile   String  @unique
+  name     String
+  isActive Boolean @default(true)
 
-  invoices    Invoice[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?  @default("Admin")
+  updatedBy String?  @default("Admin")
+
+  invoices Invoice[]
 }
 
 model Invoice {
-  id              Int      @id @default(autoincrement())
-  invoiceNumber   String   @unique
-  customerId      Int
-  invoiceDate     DateTime
-  deliveryDate    DateTime
-  isActive        Boolean  @default(true)
-  
-  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  invoiceItems    InvoiceItem[]
+  id            Int      @id @default(autoincrement())
+  invoiceNumber String   @unique
+  customerId    Int
+  invoiceDate   DateTime
+  deliveryDate  DateTime
+
+  totalQuantity  Int
+  totalPrice     Float? @default(0)
+  discountAmount Float? @default(0)
+  advanceAmount  Float? @default(0)
+  balanceAmount  Float? @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?  @default("Admin")
+  updatedBy String?  @default("Admin")
+
+  status Int @default(1)
+
+  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoiceItems InvoiceItem[]
+
   @@index([customerId, invoiceDate, deliveryDate, invoiceNumber])
 }
 
 model InvoiceItem {
-  id           Int         @id @default(autoincrement())  
-  length        Float
-  shoulder      Float
-  hand          Float
-  handLoose     String
-  neck          Float
-  chestLoose    Float
-  centreLoose   String
-  downLoose     Float
-  open          Float
-  button        String
-  design        String
-  pocket        EPocketStyle
-  sewing        ESewingType
-  sd            ESDType  
-  pan           EPanType  
-  description   String?    
-  quantity      Int
-  price         Float
-  fabric        String
+  id          Int          @id @default(autoincrement())
+  length      Float
+  shoulder    Float
+  hand        Float
+  handLoose   String
+  neck        Float
+  chestLoose  Float
+  centreLoose String
+  downLoose   Float
+  open        Float
+  button      String
+  design      String
+  pocket      EPocketStyle
+  sewing      ESewingType
+  sd          ESDType
+  pan         EPanType
+  description String?
+  quantity    Int
+  fabric      String
+  name        String
 
- 
-  isActive     Boolean     @default(true)
-  invoiceId     Int?      
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  invoiceId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  invoice       Invoice?   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
   @@index([invoiceId])
 }
 
 enum EPocketStyle {
-  P2
+  P2_ADI
   P2_BAG
 }
 

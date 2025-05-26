@@ -7,7 +7,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpResponseException } from 'src/utils/exceptions';
 import { processHttpError } from 'src/utils/helper';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
-import { PatchInvoiceDto, UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { EStatus } from 'src/utils/enums/status.enum';
 
 @Injectable()
 export class InvoicesService {
@@ -34,7 +35,19 @@ export class InvoicesService {
           invoiceNumber,
           invoiceDate: new Date().toISOString(),
           deliveryDate: new Date(createInvoiceDto.deliveryDate).toISOString(),
-          customerId: createInvoiceDto.customerId,
+          customerId: createInvoiceDto?.customerId,
+          totalPrice: createInvoiceDto?.totalPrice,
+          advanceAmount: createInvoiceDto?.advanceAmount,
+          discountAmount: createInvoiceDto?.discountAmount,
+          balanceAmount: createInvoiceDto?.totalPrice
+            ? createInvoiceDto?.totalPrice -
+              (createInvoiceDto?.advanceAmount || 0) -
+              (createInvoiceDto?.discountAmount || 0)
+            : 0,
+          totalQuantity: createInvoiceDto?.items?.reduce(
+            (acc, item) => acc + (item?.quantity || 0),
+            0,
+          ),
           invoiceItems: {
             create: createInvoiceDto.items.map((item) => ({
               ...item,
@@ -52,17 +65,11 @@ export class InvoicesService {
     }
   }
 
-  async findAll(
-    page: number = 1,
-    limit: number = 10,
-    status = true,
-    queryString?: string,
-  ) {
+  async findAll(page: number = 1, limit: number = 10, queryString?: string) {
     try {
       const offset = (page - 1) * limit;
 
       const whereClause: Prisma.InvoiceWhereInput = {
-        isActive: status,
         ...(queryString && {
           OR: [
             {
@@ -196,6 +203,18 @@ export class InvoicesService {
             ? new Date(updateInvoiceDto.deliveryDate).toISOString()
             : undefined,
           customerId: updateInvoiceDto.customerId,
+          totalPrice: updateInvoiceDto?.totalPrice,
+          advanceAmount: updateInvoiceDto?.advanceAmount,
+          discountAmount: updateInvoiceDto?.discountAmount,
+          balanceAmount: updateInvoiceDto?.totalPrice
+            ? updateInvoiceDto?.totalPrice -
+              (updateInvoiceDto?.advanceAmount || 0) -
+              (updateInvoiceDto?.discountAmount || 0)
+            : 0,
+          totalQuantity: updateInvoiceDto?.items?.reduce(
+            (acc, item) => acc + (item?.quantity || 0),
+            0,
+          ),
         },
       });
 
@@ -242,14 +261,33 @@ export class InvoicesService {
     }
   }
 
-  async remove(id: number, patchInvoiceDto: PatchInvoiceDto) {
+  async updateStatus(id: number, status: number) {
     try {
       const result = await this._prisma.invoice.update({
         where: {
           id: id,
         },
         data: {
-          isActive: patchInvoiceDto?.isActive,
+          status: status,
+        },
+      });
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
+  }
+
+  async remove(id: number) {
+    try {
+      const result = await this._prisma.invoice.update({
+        where: {
+          id: id,
+        },
+        data: {
+          status: EStatus.Cancelled,
         },
       });
       return this.httpResponseService.generate(HttpStatus.OK, result);
