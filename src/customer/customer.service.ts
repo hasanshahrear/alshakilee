@@ -47,6 +47,11 @@ export class CustomerService {
                   contains: queryString,
                 },
               },
+              {
+                name: {
+                  contains: queryString,
+                },
+              },
             ],
           }
         : undefined;

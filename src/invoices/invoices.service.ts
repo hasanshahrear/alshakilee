@@ -65,11 +65,17 @@ export class InvoicesService {
     }
   }
 
-  async findAll(page: number = 1, limit: number = 10, queryString?: string) {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    status?: string,
+    queryString?: string,
+  ) {
     try {
       const offset = (page - 1) * limit;
 
       const whereClause: Prisma.InvoiceWhereInput = {
+        ...(status && { status: Number(status) }),
         ...(queryString && {
           OR: [
             {

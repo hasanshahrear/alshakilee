@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Param,
-  ParseBoolPipe,
   Patch,
   Post,
   Put,
@@ -29,12 +28,17 @@ export class InvoicesController {
   async findAll(
     @Query('page') page: string,
     @Query('limit') limit: string,
-    @Query('status', new ParseBoolPipe()) status: boolean,
+    @Query('status') status: string,
     @Query('queryString') queryString?: string,
   ) {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
-    return await this.invoicesService.findAll(pageNum, limitNum, queryString);
+    return await this.invoicesService.findAll(
+      pageNum,
+      limitNum,
+      status,
+      queryString,
+    );
   }
 
   @Get(':id')
