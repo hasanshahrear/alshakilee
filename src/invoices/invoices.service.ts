@@ -48,6 +48,7 @@ export class InvoicesService {
             (acc, item) => acc + (item?.quantity || 0),
             0,
           ),
+          status: createInvoiceDto?.status,
           invoiceItems: {
             create: createInvoiceDto.items.map((item) => ({
               ...item,
@@ -75,7 +76,7 @@ export class InvoicesService {
       const offset = (page - 1) * limit;
 
       const whereClause: Prisma.InvoiceWhereInput = {
-        ...(status && { status: Number(status) }),
+        ...(status && Number(status) !== 0 && { status: Number(status) }),
         ...(queryString && {
           OR: [
             {
@@ -212,6 +213,7 @@ export class InvoicesService {
           totalPrice: updateInvoiceDto?.totalPrice,
           advanceAmount: updateInvoiceDto?.advanceAmount,
           discountAmount: updateInvoiceDto?.discountAmount,
+          status: updateInvoiceDto?.status,
           balanceAmount: updateInvoiceDto?.totalPrice
             ? updateInvoiceDto?.totalPrice -
               (updateInvoiceDto?.advanceAmount || 0) -

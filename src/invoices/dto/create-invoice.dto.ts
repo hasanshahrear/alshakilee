@@ -26,6 +26,8 @@ export class CreateInvoiceDto {
 
   advanceAmount?: number;
 
+  status?: number;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateItemDto)
