@@ -12,9 +12,8 @@ import {
 export class CreateItemDto {
   id?: number;
 
-  @IsNumber()
-  @Min(0)
-  length: number;
+  @IsString()
+  length: string;
 
   @IsNumber()
   @Min(0)
@@ -77,4 +76,8 @@ export class CreateItemDto {
   @IsInt()
   @IsPositive()
   quantity: number;
+
+  @IsOptional()
+  @IsString()
+  phul?: string;
 }

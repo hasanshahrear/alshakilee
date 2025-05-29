@@ -7,49 +7,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Customer {
-  id       Int     @id @default(autoincrement())
-  mobile   String  @unique
-  name     String
-  isActive Boolean @default(true)
-
+model User {
+  id        Int      @id @default(autoincrement())
+  phone     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(ADMIN)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  createdBy String?  @default("Admin")
-  updatedBy String?  @default("Admin")
+}
 
-  invoices Invoice[]
+model Customer {
+  id        Int       @id @default(autoincrement())
+  mobile    String    @unique
+  name      String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String?   @default("Admin")
+  updatedBy String?   @default("Admin")
+  invoices  Invoice[]
 }
 
 model Invoice {
-  id            Int      @id @default(autoincrement())
-  invoiceNumber String   @unique
-  customerId    Int
-  invoiceDate   DateTime
-  deliveryDate  DateTime
-
+  id             Int           @id @default(autoincrement())
+  invoiceNumber  String        @unique
+  customerId     Int
+  invoiceDate    DateTime
+  deliveryDate   DateTime
   totalQuantity  Int
-  totalPrice     Float? @default(0)
-  discountAmount Float? @default(0)
-  advanceAmount  Float? @default(0)
-  balanceAmount  Float? @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  createdBy String?  @default("Admin")
-  updatedBy String?  @default("Admin")
-
-  status Int @default(1)
-
-  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  invoiceItems InvoiceItem[]
+  totalPrice     Float?        @default(0)
+  discountAmount Float?        @default(0)
+  advanceAmount  Float?        @default(0)
+  balanceAmount  Float?        @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  createdBy      String?       @default("Admin")
+  updatedBy      String?       @default("Admin")
+  status         Int           @default(1)
+  customer       Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoiceItems   InvoiceItem[]
 
   @@index([customerId, invoiceDate, deliveryDate, invoiceNumber])
 }
 
 model InvoiceItem {
   id          Int          @id @default(autoincrement())
-  length      Float
+  length      String
   shoulder    Float
   hand        Float
   handLoose   String
@@ -68,15 +73,19 @@ model InvoiceItem {
   quantity    Int
   fabric      String
   name        String
-
-  isActive  Boolean  @default(true)
-  invoiceId Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  invoice Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  phul        String?
+  isActive    Boolean      @default(true)
+  invoiceId   Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  invoice     Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 
   @@index([invoiceId])
+}
+
+model DailyInvoiceSerial {
+  serialDate    DateTime @id @db.Date
+  currentSerial Int      @default(0)
 }
 
 enum EPocketStyle {
@@ -98,4 +107,9 @@ enum ESDType {
 enum EPanType {
   PAN
   NO_PAN
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
 }
