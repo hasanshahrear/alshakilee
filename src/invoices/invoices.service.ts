@@ -205,7 +205,9 @@ export class InvoicesService {
       await this._prisma.invoice.update({
         where: { id },
         data: {
-          invoiceDate: new Date().toISOString(),
+          invoiceDate: updateInvoiceDto?.invoiceDate
+            ? new Date(updateInvoiceDto.invoiceDate).toISOString()
+            : new Date().toISOString(),
           deliveryDate: updateInvoiceDto.deliveryDate
             ? new Date(updateInvoiceDto.deliveryDate).toISOString()
             : undefined,
