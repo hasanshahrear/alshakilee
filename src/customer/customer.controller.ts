@@ -1,9 +1,9 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
+  ParseBoolPipe,
   Patch,
   Post,
   Put,
