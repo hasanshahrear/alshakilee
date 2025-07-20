@@ -8,7 +8,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() loginDto: { phone: string; password: string }) {
-    console.log({ loginDto });
     const user = await this.authService.validateUser(
       loginDto.phone,
       loginDto.password,
