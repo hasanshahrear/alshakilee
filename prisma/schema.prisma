@@ -74,6 +74,7 @@ model InvoiceItem {
   fabric      String
   name        String
   phul        String?
+  price       Float?
   isActive    Boolean      @default(true)
   invoiceId   Int?
   createdAt   DateTime     @default(now())

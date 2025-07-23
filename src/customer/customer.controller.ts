@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,8 +16,10 @@ import { HttpResponseService } from 'src/http-response/http-response.service';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { PatchCustomerDto, UpdateCustomerDto } from './dto/update-customer.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('customer')
+@UseGuards(JwtAuthGuard)
 export class CustomerController {
   constructor(
     private readonly customerService: CustomerService,

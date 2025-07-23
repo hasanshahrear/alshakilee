@@ -80,4 +80,8 @@ export class CreateItemDto {
   @IsOptional()
   @IsString()
   phul?: string;
+
+  @IsNumber()
+  @IsOptional()
+  price: number;
 }
