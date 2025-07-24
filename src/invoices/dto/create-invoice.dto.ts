@@ -28,6 +28,8 @@ export class CreateInvoiceDto {
 
   status?: number;
 
+  priceDetails?: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateItemDto)

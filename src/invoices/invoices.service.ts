@@ -49,6 +49,7 @@ export class InvoicesService {
             0,
           ),
           status: createInvoiceDto?.status,
+          priceDetails: createInvoiceDto?.priceDetails,
           invoiceItems: {
             create: createInvoiceDto.items.map((item) => ({
               ...item,
@@ -213,6 +214,7 @@ export class InvoicesService {
           advanceAmount: updateInvoiceDto?.advanceAmount,
           discountAmount: updateInvoiceDto?.discountAmount,
           status: updateInvoiceDto?.status,
+          priceDetails: updateInvoiceDto?.priceDetails,
           balanceAmount: updateInvoiceDto?.totalPrice
             ? updateInvoiceDto?.totalPrice -
               (updateInvoiceDto?.advanceAmount || 0) -
