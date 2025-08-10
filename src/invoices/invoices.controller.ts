@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
@@ -61,6 +60,14 @@ export class InvoicesController {
   @Patch('/status/:id')
   async updateStatus(@Param('id') id: string, @Body('status') status: number) {
     return this.invoicesService.updateStatus(+id, status);
+  }
+
+  @Patch('/delivery-date-update/:id')
+  async updateDeliveryDate(
+    @Param('id') id: string,
+    @Body('deliveryDate') deliveryDate: Date,
+  ) {
+    return this.invoicesService.updateDeliveryDate(+id, deliveryDate);
   }
 
   @Patch(':id')

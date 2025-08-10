@@ -279,6 +279,31 @@ export class InvoicesService {
         data: {
           status: status,
         },
+        include: {
+          customer: true,
+        },
+      });
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
+  }
+
+  async updateDeliveryDate(id: number, deliveryDate: Date) {
+    try {
+      const result = await this._prisma.invoice.update({
+        where: {
+          id,
+        },
+        data: {
+          deliveryDate,
+        },
+        include: {
+          customer: true,
+        },
       });
       return this.httpResponseService.generate(HttpStatus.OK, result);
     } catch (error) {
