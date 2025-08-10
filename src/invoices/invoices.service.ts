@@ -332,4 +332,58 @@ export class InvoicesService {
       );
     }
   }
+
+  async getUpcomingDeliveryOrderList() {
+    try {
+      const today = new Date();
+      const next5Days = new Date();
+      next5Days.setDate(today.getDate() + 5);
+
+      const page: number = 1;
+      const limit: number = 1000;
+
+      const whereClause: Prisma.InvoiceWhereInput = {
+        deliveryDate: {
+          gte: today,
+          lte: next5Days,
+        },
+        status: {
+          notIn: [EStatus.Cancelled, EStatus.Delivered],
+        },
+      };
+
+      const [data, total] = await Promise.all([
+        this._prisma.invoice.findMany({
+          where: whereClause,
+          include: {
+            customer: true,
+          },
+          orderBy: {
+            deliveryDate: 'asc',
+          },
+        }),
+
+        this._prisma.invoice.count({
+          where: whereClause,
+        }),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+
+      return this.httpResponseService.generate(HttpStatus.OK, {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
+  }
 }

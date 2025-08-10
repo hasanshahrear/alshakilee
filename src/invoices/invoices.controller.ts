@@ -44,6 +44,11 @@ export class InvoicesController {
     );
   }
 
+  @Get('get-upcoming-delivery-order-list')
+  async getUpcomingDeliveryOrderList() {
+    return this.invoicesService.getUpcomingDeliveryOrderList();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.invoicesService.findOne(+id);
