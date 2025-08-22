@@ -206,9 +206,10 @@ export class InvoicesService {
       await this._prisma.invoice.update({
         where: { id },
         data: {
-          deliveryDate: updateInvoiceDto.deliveryDate
-            ? new Date(updateInvoiceDto.deliveryDate).toISOString()
-            : undefined,
+          deliveryDate:
+            updateInvoiceDto?.status === EStatus.Delivered
+              ? new Date().toISOString()
+              : new Date(updateInvoiceDto.deliveryDate).toISOString(),
           customerId: updateInvoiceDto.customerId,
           totalPrice: updateInvoiceDto?.totalPrice,
           advanceAmount: updateInvoiceDto?.advanceAmount,
@@ -344,11 +345,10 @@ export class InvoicesService {
 
       const whereClause: Prisma.InvoiceWhereInput = {
         deliveryDate: {
-          gte: today,
           lte: next5Days,
         },
         status: {
-          notIn: [EStatus.Cancelled, EStatus.Delivered],
+          in: [EStatus.Pending, EStatus.Processing],
         },
       };
 
