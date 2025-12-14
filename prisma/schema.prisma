@@ -91,6 +91,40 @@ model DailyInvoiceSerial {
   currentSerial Int      @default(0)
 }
 
+model EmployeeType {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  employees Employee[]
+}
+
+model Employee {
+  id              Int            @id @default(autoincrement())
+  email           String         @unique
+  firstName       String?
+  lastName        String?
+  googleId        String?        @unique
+  profilePicture  String?
+  employeeTypeId  Int
+  status          EmployeeStatus @default(PENDING)
+  isActive        Boolean        @default(true)
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  employeeType EmployeeType @relation(fields: [employeeTypeId], references: [id])
+
+  @@index([employeeTypeId])
+  @@index([status])
+}
+
+enum EmployeeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum EPocketStyle {
   P2_ADI
   P2_BAG

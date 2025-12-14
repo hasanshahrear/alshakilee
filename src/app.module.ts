@@ -7,6 +7,8 @@ import { InvoicesModule } from './invoices/invoices.module';
 import { LoggerModule } from './logger/logger.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { EmployeeModule } from './employee/employee.module';
+import { EmployeeTypeModule } from './employee-type/employee-type.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { AuthModule } from './auth/auth.module';
     InvoicesModule,
     UserModule,
     AuthModule,
+    EmployeeModule,
+    EmployeeTypeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
