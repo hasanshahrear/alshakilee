@@ -115,4 +115,5 @@ enum EPanType {
 enum UserRole {
   ADMIN
   EDITOR
+  EMPLOYEE
 }
