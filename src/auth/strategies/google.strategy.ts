@@ -35,7 +35,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
         if (employee) {
           // Update existing employee with Google ID
-          employee = await this.employeeService.update(employee.id, {});
+          const updateResponse = await this.employeeService.update(
+            employee.id,
+            {},
+          );
+          return done(null, updateResponse?.data || updateResponse);
         } else {
           // Create new employee in pending status
           // Note: employeeTypeId should be assigned during admin approval

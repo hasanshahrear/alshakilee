@@ -1,56 +1,137 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { HttpResponseService } from '../http-response/http-response.service';
+import { LoggerService } from '../logger/logger.service';
+import { HttpResponseException } from '../utils/exceptions';
+import { processHttpError } from '../utils/helper';
 import { CreateEmployeeTypeDto } from './dto/create-employee-type.dto';
-import { UpdateEmployeeTypeDto } from './dto/update-employee-type.dto';
+import {
+  PatchEmployeeTypeDto,
+  UpdateEmployeeTypeDto,
+} from './dto/update-employee-type.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class EmployeeTypeService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private httpResponseService: HttpResponseService,
+    private logger: LoggerService,
+  ) {}
 
   async create(createEmployeeTypeDto: CreateEmployeeTypeDto) {
-    // Check if employee type already exists
-    const existingType = await this.prisma.employeeType.findUnique({
-      where: { name: createEmployeeTypeDto.name },
-    });
+    try {
+      const existingType = await this.prisma.employeeType.findUnique({
+        where: { name: createEmployeeTypeDto.name },
+      });
 
-    if (existingType) {
-      throw new BadRequestException(
-        'Employee type with this name already exists',
+      if (existingType) {
+        throw new HttpResponseException(
+          this.httpResponseService.generate(
+            HttpStatus.BAD_REQUEST,
+            null,
+            'Employee type with this name already exists',
+          ),
+        );
+      }
+
+      const result = await this.prisma.employeeType.create({
+        data: createEmployeeTypeDto,
+      });
+
+      return this.httpResponseService.generate(HttpStatus.CREATED, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
       );
     }
-
-    return this.prisma.employeeType.create({
-      data: createEmployeeTypeDto,
-      include: {
-        employees: true,
-      },
-    });
   }
 
-  async findAll() {
-    return this.prisma.employeeType.findMany({
-      include: {
-        employees: true,
-      },
-      orderBy: {
-        name: 'asc',
-      },
-    });
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    status = true,
+    queryString: string,
+  ) {
+    try {
+      const offset = (page - 1) * limit;
+
+      const searchFilter: Prisma.EmployeeTypeWhereInput | undefined =
+        queryString
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: queryString,
+                  },
+                },
+              ],
+            }
+          : undefined;
+
+      const [data, total] = await Promise.all([
+        this.prisma.employeeType.findMany({
+          skip: offset,
+          take: limit,
+          orderBy: {
+            id: 'desc',
+          },
+          where: {
+            isActive: status,
+            ...searchFilter,
+          },
+        }),
+        this.prisma.employeeType.count({
+          where: {
+            isActive: status,
+            ...searchFilter,
+          },
+        }),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+
+      return this.httpResponseService.generate(HttpStatus.OK, {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 
   async findOne(id: number) {
-    const employeeType = await this.prisma.employeeType.findUnique({
-      where: { id },
-      include: {
-        employees: true,
-      },
-    });
+    try {
+      const result = await this.prisma.employeeType.findUnique({
+        where: { id },
+      });
 
-    if (!employeeType) {
-      throw new BadRequestException('Employee type not found');
+      if (!result) {
+        throw new HttpResponseException(
+          this.httpResponseService.generate(
+            HttpStatus.NOT_FOUND,
+            null,
+            'Employee type not found',
+          ),
+        );
+      }
+
+      return result;
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
     }
-
-    return employeeType;
   }
 
   async findByName(name: string) {
@@ -63,55 +144,63 @@ export class EmployeeTypeService {
   }
 
   async update(id: number, updateEmployeeTypeDto: UpdateEmployeeTypeDto) {
-    const employeeType = await this.findOne(id);
+    try {
+      const employeeType = await this.findOne(id);
 
-    // Check if new name is unique (if name is being updated)
-    if (
-      updateEmployeeTypeDto.name &&
-      updateEmployeeTypeDto.name !== employeeType.name
-    ) {
-      const existingType = await this.prisma.employeeType.findUnique({
-        where: { name: updateEmployeeTypeDto.name },
+      // Check if new name is unique (if name is being updated)
+      if (
+        updateEmployeeTypeDto.name &&
+        updateEmployeeTypeDto.name !== employeeType.name
+      ) {
+        const existingType = await this.prisma.employeeType.findUnique({
+          where: { name: updateEmployeeTypeDto.name },
+        });
+
+        if (existingType) {
+          throw new HttpResponseException(
+            this.httpResponseService.generate(
+              HttpStatus.BAD_REQUEST,
+              null,
+              'Employee type with this name already exists',
+            ),
+          );
+        }
+      }
+
+      const result = await this.prisma.employeeType.update({
+        where: { id },
+        data: updateEmployeeTypeDto,
+        include: {
+          employees: true,
+        },
       });
 
-      if (existingType) {
-        throw new BadRequestException(
-          'Employee type with this name already exists',
-        );
-      }
-    }
-
-    return this.prisma.employeeType.update({
-      where: { id },
-      data: updateEmployeeTypeDto,
-      include: {
-        employees: true,
-      },
-    });
-  }
-
-  async remove(id: number) {
-    const employeeType = await this.findOne(id);
-
-    // Check if any employees are using this type
-    if (employeeType.employees.length > 0) {
-      throw new BadRequestException(
-        `Cannot delete employee type with ${employeeType.employees.length} active employee(s)`,
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
       );
     }
-
-    return this.prisma.employeeType.delete({
-      where: { id },
-    });
   }
 
-  async getEmployeeCount(id: number) {
-    const employeeType = await this.findOne(id);
-    return {
-      id: employeeType.id,
-      name: employeeType.name,
-      employeeCount: employeeType.employees.length,
-      employees: employeeType.employees,
-    };
+  async remove(id: number, patchEmployeeTypeDto: PatchEmployeeTypeDto) {
+    try {
+      const result = await this.prisma.employeeType.update({
+        where: {
+          id: id,
+        },
+        data: {
+          isActive: patchEmployeeTypeDto?.isActive,
+        },
+      });
+
+      return this.httpResponseService.generate(HttpStatus.OK, result);
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 }

@@ -1,9 +1,10 @@
-import { IsString, MinLength, MaxLength, IsOptional } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { IsBoolean } from 'class-validator';
+import { CreateEmployeeTypeDto } from './create-employee-type.dto';
 
-export class UpdateEmployeeTypeDto {
-  @IsString()
-  @MinLength(2)
-  @MaxLength(100)
-  @IsOptional()
-  name?: string;
+export class UpdateEmployeeTypeDto extends PartialType(CreateEmployeeTypeDto) {}
+
+export class PatchEmployeeTypeDto extends PartialType(CreateEmployeeTypeDto) {
+  @IsBoolean()
+  isActive?: boolean;
 }

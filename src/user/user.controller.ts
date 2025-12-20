@@ -9,6 +9,8 @@ import {
   ValidationPipe,
   Put,
   UseGuards,
+  Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -27,8 +29,20 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('status', new ParseBoolPipe()) status: boolean,
+    @Query('queryString') queryString?: string,
+  ) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    return await this.userService.findAll(
+      pageNum,
+      limitNum,
+      status,
+      queryString,
+    );
   }
 
   @Get(':phone')

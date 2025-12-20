@@ -5,6 +5,9 @@ import { HttpResponseService } from 'src/http-response/http-response.service';
 import { LoggerService } from 'src/logger/logger.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { processHttpError } from 'src/utils/helper';
+import { HttpResponseException } from 'src/utils/exceptions';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -26,9 +29,71 @@ export class UserService {
     return this.httpResponseService.generate(HttpStatus.CREATED, user);
   }
 
-  async findAll() {
-    const users = await this._prisma.user.findMany();
-    return this.httpResponseService.generate(HttpStatus.OK, users);
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    status = true,
+    queryString: string,
+  ) {
+    try {
+      const offset = (page - 1) * limit;
+
+      const searchFilter: Prisma.UserWhereInput | undefined = queryString
+        ? {
+            OR: [
+              {
+                phone: {
+                  contains: queryString,
+                },
+              },
+              {
+                name: {
+                  contains: queryString,
+                },
+              },
+            ],
+          }
+        : undefined;
+
+      const [data, total] = await Promise.all([
+        this._prisma.user.findMany({
+          skip: offset,
+          take: limit,
+          orderBy: {
+            id: 'desc',
+          },
+          where: {
+            isActive: status,
+            ...searchFilter,
+          },
+        }),
+        this._prisma.user.count({
+          where: {
+            isActive: status,
+            ...searchFilter,
+          },
+        }),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+
+      const filteredData = data?.map(({ password, ...rest }) => rest);
+
+      return this.httpResponseService.generate(HttpStatus.OK, {
+        data: filteredData,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages,
+        },
+      });
+    } catch (error) {
+      processHttpError(error, this.logger);
+      throw new HttpResponseException(
+        this.httpResponseService.generate(HttpStatus.INTERNAL_SERVER_ERROR),
+      );
+    }
   }
 
   async findByPhone(phone: string) {

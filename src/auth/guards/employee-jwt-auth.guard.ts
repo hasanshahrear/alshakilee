@@ -31,7 +31,10 @@ export class EmployeeJwtAuthGuard
     }
 
     // Check if user is an employee
-    const employee = await this.employeeService.findOne(user.userId);
+    const employeeResponse = await this.employeeService.findOne(user.userId);
+
+    // Handle wrapped response from findOne
+    const employee = employeeResponse?.data || employeeResponse;
 
     if (!employee) {
       throw new UnauthorizedException('Employee not found');

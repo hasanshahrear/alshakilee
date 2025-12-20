@@ -90,13 +90,16 @@ export class AuthService {
     profilePicture?: string;
   }) {
     try {
-      const employee = await this.employeeService.create({
+      const createResponse = await this.employeeService.create({
         email: registerDto.email,
         firstName: registerDto.firstName,
         lastName: registerDto.lastName,
         employeeTypeId: registerDto.employeeTypeId,
         profilePicture: registerDto.profilePicture,
       });
+
+      // Extract employee data from wrapped response
+      const employee = createResponse?.data || createResponse;
 
       return {
         status: 'PENDING',

@@ -94,6 +94,9 @@ model DailyInvoiceSerial {
 model EmployeeType {
   id        Int        @id @default(autoincrement())
   name      String     @unique
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   employees Employee[]
 }
 
@@ -149,4 +152,5 @@ enum EPanType {
 enum UserRole {
   ADMIN
   EDITOR
+  EMPLOYEE
 }
