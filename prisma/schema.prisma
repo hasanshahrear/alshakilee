@@ -16,6 +16,9 @@ model User {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  employeeTypeId Int?
+  employeeType   EmployeeType? @relation(fields: [employeeTypeId], references: [id])
 }
 
 model Customer {
@@ -92,40 +95,12 @@ model DailyInvoiceSerial {
 }
 
 model EmployeeType {
-  id        Int        @id @default(autoincrement())
-  name      String     @unique
-  isActive  Boolean    @default(true)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  employees Employee[]
-}
-
-model Employee {
-  id              Int            @id @default(autoincrement())
-  email           String         @unique
-  firstName       String?
-  lastName        String?
-  googleId        String?        @unique
-  profilePicture  String?
-  employeeTypeId  Int
-  status          EmployeeStatus @default(PENDING)
-  isActive        Boolean        @default(true)
-  approvedBy      String?
-  approvedAt      DateTime?
-  rejectionReason String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  employeeType EmployeeType @relation(fields: [employeeTypeId], references: [id])
-
-  @@index([employeeTypeId])
-  @@index([status])
-}
-
-enum EmployeeStatus {
-  PENDING
-  APPROVED
-  REJECTED
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User[]
 }
 
 enum EPocketStyle {
