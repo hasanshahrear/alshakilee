@@ -137,9 +137,6 @@ export class EmployeeTypeService {
   async findByName(name: string) {
     return this.prisma.employeeType.findUnique({
       where: { name },
-      include: {
-        employees: true,
-      },
     });
   }
 
@@ -170,9 +167,6 @@ export class EmployeeTypeService {
       const result = await this.prisma.employeeType.update({
         where: { id },
         data: updateEmployeeTypeDto,
-        include: {
-          employees: true,
-        },
       });
 
       return this.httpResponseService.generate(HttpStatus.OK, result);
