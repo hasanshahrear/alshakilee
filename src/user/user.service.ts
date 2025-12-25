@@ -66,6 +66,9 @@ export class UserService {
             isActive: status,
             ...searchFilter,
           },
+          include: {
+            employeeType: true,
+          },
         }),
         this._prisma.user.count({
           where: {
@@ -99,6 +102,13 @@ export class UserService {
   async findByPhone(phone: string) {
     return this._prisma.user.findUnique({
       where: { phone },
+      include: { employeeType: true },
+    });
+  }
+
+  async findOneById(id: number) {
+    return this._prisma.user.findUnique({
+      where: { id },
     });
   }
 

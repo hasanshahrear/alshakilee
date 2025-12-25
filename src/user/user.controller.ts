@@ -44,6 +44,10 @@ export class UserController {
       queryString,
     );
   }
+  @Get(':id')
+  async findOneById(@Param('id') id: string) {
+    return this.userService.findOneById(+id);
+  }
 
   @Get(':phone')
   findOne(@Param('phone') phone: string) {
