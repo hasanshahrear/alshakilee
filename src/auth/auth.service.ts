@@ -20,7 +20,10 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { phone: user.phone, sub: user.id };
+    const { password, createdAt, updatedAt, ...rest } =
+      await this.userService.findByPhone(user.phone);
+
+    const payload = { phone: user.phone, sub: user.id, user: rest };
     return {
       accessToken: this.jwtService.sign(payload),
       user: {
@@ -28,6 +31,7 @@ export class AuthService {
         phone: user.phone,
         name: user.name,
         role: user.role,
+        employeeTypeId: user.employeeTypeId,
       },
     };
   }

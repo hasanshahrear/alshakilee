@@ -16,6 +16,9 @@ model User {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  employeeTypeId Int?
+  employeeType   EmployeeType? @relation(fields: [employeeTypeId], references: [id])
 }
 
 model Customer {
@@ -91,6 +94,15 @@ model DailyInvoiceSerial {
   currentSerial Int      @default(0)
 }
 
+model EmployeeType {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User[]
+}
+
 enum EPocketStyle {
   P2_ADI
   P2_BAG
@@ -115,4 +127,5 @@ enum EPanType {
 enum UserRole {
   ADMIN
   EDITOR
+  EMPLOYEE
 }
