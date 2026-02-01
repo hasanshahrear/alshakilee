@@ -38,7 +38,24 @@ export class InvoiceTrackingController {
    */
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll(@Query() paginationDto: PaginationInvoiceTrackingDto) {
+  async findAll(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('status') status: string,
+    @Query('userId') userId: string,
+    @Query('employeeTypeId') employeeTypeId: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    const paginationDto: PaginationInvoiceTrackingDto = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      status,
+      userId: parseInt(userId, 10),
+      employeeTypeId: parseInt(employeeTypeId, 10),
+      startDate,
+      endDate,
+    };
     return this.invoiceTrackingService.findAll(paginationDto);
   }
 

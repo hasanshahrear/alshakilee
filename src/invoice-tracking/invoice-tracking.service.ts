@@ -178,6 +178,8 @@ export class InvoiceTrackingService {
         userId,
         employeeTypeId,
         status,
+        startDate,
+        endDate,
       } = paginationDto;
       const offset = (page - 1) * limit;
 
@@ -194,6 +196,25 @@ export class InvoiceTrackingService {
 
       if (status) {
         whereClause.status = status;
+      }
+
+      if (startDate && endDate) {
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        whereClause.changedAt = {
+          gte: new Date(startDate),
+          lte: endOfDay,
+        };
+      } else if (startDate) {
+        whereClause.changedAt = {
+          gte: new Date(startDate),
+        };
+      } else if (endDate) {
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        whereClause.changedAt = {
+          lte: endOfDay,
+        };
       }
 
       const [data, total] = await Promise.all([
@@ -217,6 +238,8 @@ export class InvoiceTrackingService {
           where: whereClause,
         }),
       ]);
+
+      console.log({ data, startDate, endDate, whereClause });
 
       const totalPages = Math.ceil(total / limit);
 
