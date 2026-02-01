@@ -8,6 +8,7 @@ import { LoggerModule } from './logger/logger.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EmployeeTypeModule } from './employee-type/employee-type.module';
+import { InvoiceTrackingModule } from './invoice-tracking/invoice-tracking.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { EmployeeTypeModule } from './employee-type/employee-type.module';
     UserModule,
     AuthModule,
     EmployeeTypeModule,
+    InvoiceTrackingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

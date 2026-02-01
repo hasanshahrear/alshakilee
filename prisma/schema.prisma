@@ -17,8 +17,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  employeeTypeId Int?
-  employeeType   EmployeeType? @relation(fields: [employeeTypeId], references: [id])
+  employeeTypeId   Int?
+  employeeType     EmployeeType?     @relation(fields: [employeeTypeId], references: [id])
+  invoiceTrackings InvoiceTracking[]
 }
 
 model Customer {
@@ -51,8 +52,9 @@ model Invoice {
   status         Int      @default(1)
   priceDetails   Json?    @default("[]")
 
-  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  invoiceItems InvoiceItem[]
+  customer         Customer          @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoiceItems     InvoiceItem[]
+  invoiceTrackings InvoiceTracking[]
 
   @@index([customerId, invoiceDate, deliveryDate, invoiceNumber])
 }
@@ -95,12 +97,29 @@ model DailyInvoiceSerial {
 }
 
 model EmployeeType {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User[]
+  id               Int               @id @default(autoincrement())
+  name             String            @unique
+  isActive         Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  user             User[]
+  invoiceTrackings InvoiceTracking[]
+}
+
+model InvoiceTracking {
+  id             Int      @id @default(autoincrement())
+  invoiceId      Int
+  userId         Int
+  employeeTypeId Int
+  status         String
+  changedAt      DateTime @default(now())
+  changedBy      String?
+
+  invoice      Invoice       @relation(fields: [invoiceId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  employeeType EmployeeType? @relation(fields: [employeeTypeId], references: [id])
+
+  @@index([invoiceId, changedAt])
 }
 
 enum EPocketStyle {
